@@ -9,6 +9,8 @@ function Results() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [results, setResults] = useState(null)
+  const [saveStatus, setSaveStatus] = useState('idle')
+  const [saveError, setSaveError] = useState('')
 
   useEffect(() => {
     if (!formData) return
@@ -64,12 +66,43 @@ function Results() {
 
   const { nights, currency, flights, hotels, breakdown } = results
 
+  const handleSave = async () => {
+    setSaveStatus('saving')
+    setSaveError('')
+
+    try {
+      await apiClient.post('/trips', {
+        destination: results.destination,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        nights: results.nights,
+        travelers: formData.travelers,
+        homeCurrency: results.currency,
+        flightClass: formData.flightClass,
+        hotelRating: formData.hotelRating,
+        dateFlexibility: formData.dateFlexibility,
+        flights: results.flights,
+        hotels: results.hotels,
+        breakdown: results.breakdown,
+      })
+      setSaveStatus('saved')
+    } catch (err) {
+      setSaveStatus('error')
+      setSaveError(err.response?.data?.error || 'Failed to save trip. Please try again.')
+    }
+  }
+
   return (
     <div>
       <h1>Trip to {results.destination}</h1>
       <p>
         {nights} night{nights === 1 ? '' : 's'} &middot; budget {breakdown.totalBudget} {currency}
       </p>
+
+      <button onClick={handleSave} disabled={saveStatus === 'saving' || saveStatus === 'saved'}>
+        {saveStatus === 'saved' ? 'Trip saved' : saveStatus === 'saving' ? 'Saving...' : 'Save this trip'}
+      </button>
+      {saveStatus === 'error' && <p role="alert">{saveError}</p>}
 
       <section>
         <h2>Budget breakdown</h2>
