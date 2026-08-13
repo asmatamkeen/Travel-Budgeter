@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useLocation, Navigate } from 'react-router-dom'
+import { useLocation, Navigate, Link } from 'react-router-dom'
 import apiClient from '../api/client'
+import TripSummary from '../components/TripSummary'
 
 function Results() {
   const location = useLocation()
@@ -64,8 +65,6 @@ function Results() {
     )
   }
 
-  const { nights, currency, flights, hotels, breakdown } = results
-
   const handleSave = async () => {
     setSaveStatus('saving')
     setSaveError('')
@@ -94,9 +93,8 @@ function Results() {
 
   return (
     <div>
-      <h1>Trip to {results.destination}</h1>
       <p>
-        {nights} night{nights === 1 ? '' : 's'} &middot; budget {breakdown.totalBudget} {currency}
+        <Link to="/plan">Plan another trip</Link> | <Link to="/dashboard">My trips</Link>
       </p>
 
       <button onClick={handleSave} disabled={saveStatus === 'saving' || saveStatus === 'saved'}>
@@ -104,49 +102,14 @@ function Results() {
       </button>
       {saveStatus === 'error' && <p role="alert">{saveError}</p>}
 
-      <section>
-        <h2>Budget breakdown</h2>
-        <ul>
-          <li>
-            Flight: {breakdown.flightCost} {currency}
-          </li>
-          <li>
-            Hotel: {breakdown.hotelCost} {currency}
-          </li>
-          <li>
-            Leftover: {breakdown.leftover} {currency}
-            {breakdown.leftover < 0 && ' (over budget)'}
-          </li>
-        </ul>
-      </section>
-
-      <section>
-        <h2>Flights</h2>
-        {flights.length === 0 && <p>No flights found.</p>}
-        <ul>
-          {flights.map((f) => (
-            <li key={f.flightNumber}>
-              {f.airline} {f.flightNumber} &middot; {f.cabinClass} &middot;{' '}
-              {f.stops === 0 ? 'nonstop' : `${f.stops} stop(s)`} &middot;{' '}
-              {f.totalPrice} {currency}
-              {!f.withinBudget && ' (over budget)'}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section>
-        <h2>Hotels</h2>
-        {hotels.length === 0 && <p>No hotels found.</p>}
-        <ul>
-          {hotels.map((h) => (
-            <li key={h.name}>
-              {h.name} &middot; {h.starRating}-star &middot; {h.totalPrice} {currency} total
-              {!h.withinBudget && ' (over budget)'}
-            </li>
-          ))}
-        </ul>
-      </section>
+      <TripSummary
+        destination={results.destination}
+        nights={results.nights}
+        currency={results.currency}
+        flights={results.flights}
+        hotels={results.hotels}
+        breakdown={results.breakdown}
+      />
     </div>
   )
 }

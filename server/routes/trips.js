@@ -30,4 +30,19 @@ router.get("/", requireAuth, async (req, res) => {
   }
 });
 
+router.get("/:id", requireAuth, async (req, res) => {
+  try {
+    const trip = await Trip.findOne({ _id: req.params.id, user: req.userId });
+
+    if (!trip) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
+
+    res.json(trip);
+  } catch (err) {
+    console.error("Fetch trip failed:", err.message);
+    res.status(500).json({ error: "Failed to fetch trip" });
+  }
+});
+
 export default router;

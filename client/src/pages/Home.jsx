@@ -18,7 +18,7 @@ function Home() {
     <div>
       <h1>Welcome, {user.email}</h1>
       <p>
-        <Link to="/plan">Plan a trip</Link>
+        <Link to="/plan">Plan a trip</Link> | <Link to="/dashboard">My trips</Link>
       </p>
       <button onClick={logout}>Log out</button>
     </div>

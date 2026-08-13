@@ -4,6 +4,8 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Wizard from './pages/Wizard'
 import Results from './pages/Results'
+import Dashboard from './pages/Dashboard'
+import TripDetail from './pages/TripDetail'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -25,6 +27,22 @@ function App() {
         element={
           <ProtectedRoute>
             <Results />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/trips/:id"
+        element={
+          <ProtectedRoute>
+            <TripDetail />
           </ProtectedRoute>
         }
       />
