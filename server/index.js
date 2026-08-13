@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import currencyRoutes from "./routes/currency.js";
 import authRoutes from "./routes/auth.js";
+import searchRoutes from "./routes/search.js";
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/currency", currencyRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/search", searchRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
