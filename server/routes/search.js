@@ -4,6 +4,7 @@ import { getExchangeRate } from "../utils/exchangeRate.js";
 import { resolveLocation, searchRealFlights, searchRealHotels } from "../utils/skyScrapper.js";
 import mockFlights from "../data/mockFlights.js";
 import mockHotels from "../data/mockHotels.js";
+import SearchCache from "../models/SearchCache.js";
 
 const router = express.Router();
 
@@ -25,11 +26,28 @@ function nightsBetween(startDate, endDate) {
   return Math.round((end - start) / msPerNight)
 }
 
-// Tries the real Sky Scrapper API for both flights and hotels. If any step
-// fails - unresolvable location, API error, quota exceeded, no results -
-// the whole search falls back to mock data together, so a trip never ends
-// up mixing one real and one simulated half.
+function buildCacheKey({ origin, destination, date, cabinClass, checkin, checkout }) {
+  const normalize = (s) => s.trim().toLowerCase()
+  return [normalize(origin), normalize(destination), date, cabinClass, checkin, checkout].join("|")
+}
+
+// Tries the real Sky Scrapper API for both flights and hotels, reusing a
+// recent cached result for the same route/dates/class when one exists so
+// repeat searches don't burn the (very limited) free-tier quota. If
+// anything fails - unresolvable location, API error, quota exceeded, no
+// results - the whole search falls back to mock data together, so a trip
+// never ends up mixing one real and one simulated half. Mock results are
+// never cached, since a temporary outage shouldn't keep serving stale
+// simulated data once the real API recovers.
 async function getSearchPools({ origin, destination, date, cabinClass, checkin, checkout }) {
+  const cacheKey = buildCacheKey({ origin, destination, date, cabinClass, checkin, checkout })
+
+  const cached = await SearchCache.findOne({ cacheKey })
+  if (cached) {
+    console.log("Search cache hit:", cacheKey)
+    return { source: "real", flightPool: cached.flightPool, hotelPool: cached.hotelPool }
+  }
+
   try {
     const [originLoc, destLoc] = await Promise.all([
       resolveLocation(origin),
@@ -71,6 +89,14 @@ async function getSearchPools({ origin, destination, date, cabinClass, checkin, 
       starRating: h.stars ?? 0,
       priceUSD: h.rawPrice ?? 0,
     }))
+
+    console.log("Search cache miss, fetched fresh real data:", cacheKey)
+    SearchCache.create({ cacheKey, flightPool, hotelPool }).catch((err) => {
+      // A near-simultaneous duplicate write is harmless (unique index just
+      // rejects the second one) - anything else is worth knowing about but
+      // shouldn't fail the search itself.
+      console.error("Failed to write search cache:", err.message)
+    })
 
     return { source: "real", flightPool, hotelPool }
   } catch (err) {
