@@ -1,3 +1,5 @@
+import BudgetChart from './BudgetChart'
+
 function TripSummary({ origin, destination, nights, currency, flights, hotels, breakdown }) {
   return (
     <div>
@@ -9,6 +11,7 @@ function TripSummary({ origin, destination, nights, currency, flights, hotels, b
 
       <section>
         <h2>Budget breakdown</h2>
+        <BudgetChart breakdown={breakdown} currency={currency} />
         <ul>
           <li>
             Flight: {breakdown.flightCost} {currency}
