@@ -71,6 +71,7 @@ function Results() {
 
     try {
       await apiClient.post('/trips', {
+        origin: results.origin,
         destination: results.destination,
         startDate: formData.startDate,
         endDate: formData.endDate,
@@ -102,7 +103,16 @@ function Results() {
       </button>
       {saveStatus === 'error' && <p role="alert">{saveError}</p>}
 
+      {results.dataSource === 'mock' && (
+        <p>
+          Showing simulated flight and hotel data — live search is temporarily unavailable
+          (API limit reached or a booking site didn't respond). Try again later for real
+          results.
+        </p>
+      )}
+
       <TripSummary
+        origin={results.origin}
         destination={results.destination}
         nights={results.nights}
         currency={results.currency}

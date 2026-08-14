@@ -1,8 +1,9 @@
-function TripSummary({ destination, nights, currency, flights, hotels, breakdown }) {
+function TripSummary({ origin, destination, nights, currency, flights, hotels, breakdown }) {
   return (
     <div>
       <h1>Trip to {destination}</h1>
       <p>
+        {origin && <>From {origin} &middot; </>}
         {nights} night{nights === 1 ? '' : 's'} &middot; budget {breakdown.totalBudget} {currency}
       </p>
 

@@ -33,6 +33,7 @@ const tripSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    origin: { type: String, required: true },
     destination: { type: String, required: true },
     startDate: { type: String, required: true },
     endDate: { type: String, required: true },

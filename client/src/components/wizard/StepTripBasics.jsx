@@ -6,6 +6,11 @@ function StepTripBasics({ formData, updateFormData, onNext, onBack }) {
   const handleSubmit = (e) => {
     e.preventDefault()
 
+    if (!formData.origin.trim()) {
+      setError('Enter where you are departing from')
+      return
+    }
+
     if (!formData.destination.trim()) {
       setError('Enter a destination')
       return
@@ -28,6 +33,17 @@ function StepTripBasics({ formData, updateFormData, onNext, onBack }) {
 
   return (
     <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="origin">Departing from</label>
+        <input
+          id="origin"
+          type="text"
+          placeholder="e.g. London"
+          value={formData.origin}
+          onChange={(e) => updateFormData({ origin: e.target.value })}
+          required
+        />
+      </div>
       <div>
         <label htmlFor="destination">Destination</label>
         <input

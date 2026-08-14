@@ -55,6 +55,7 @@ function TripDetail() {
         <Link to="/dashboard">Back to my trips</Link>
       </p>
       <TripSummary
+        origin={trip.origin}
         destination={trip.destination}
         nights={trip.nights}
         currency={trip.homeCurrency}

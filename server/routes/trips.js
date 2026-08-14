@@ -5,9 +5,9 @@ import Trip from "../models/Trip.js";
 const router = express.Router();
 
 router.post("/", requireAuth, async (req, res) => {
-  const { destination, startDate, endDate, breakdown } = req.body;
+  const { origin, destination, startDate, endDate, breakdown } = req.body;
 
-  if (!destination || !startDate || !endDate || !breakdown) {
+  if (!origin || !destination || !startDate || !endDate || !breakdown) {
     return res.status(400).json({ error: "Missing required trip data" });
   }
 

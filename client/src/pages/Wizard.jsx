@@ -9,6 +9,7 @@ const STEPS = ['Budget & Currency', 'Trip Basics', 'Preferences']
 const initialFormData = {
   totalBudget: '',
   homeCurrency: 'USD',
+  origin: '',
   destination: '',
   startDate: '',
   endDate: '',
